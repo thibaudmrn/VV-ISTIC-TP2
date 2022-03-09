@@ -1,3 +1,3 @@
 # Code of your exercise
 
-Put here all the code created for this exercise
+Le code pour cet exercice est présent dans le dossier [code](code).

@@ -23,3 +23,36 @@ Use your rule with different projects and describe you findings below. See the [
 
 ## Answer
 
+Pour éviter les if imbriqués, il faut utiliser la règle suivante.
+
+```xml
+<rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
+    <properties>
+        <property name="problemDepth" value="3" />
+    </properties>
+</rule>
+```
+
+Il est possible de régler la profondeur maximale voulue en modifiant le paramètre ```value```.
+
+Si on exécute cette règle, on peut trouver des if imbriqués comme celui-ci. On remarque qu'il n'est en effet pas nécessaire dans ce cas d'imbriquer les if.
+````java
+public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+    if (map != null) {
+        final Object answer = map.get(key);
+        if (answer != null) {
+            if (answer instanceof Boolean) {
+                return (Boolean) answer;
+            }
+            if (answer instanceof String) {
+                return Boolean.valueOf((String) answer);
+            }
+            if (answer instanceof Number) {
+                final Number n = (Number) answer;
+                return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+            }
+        }
+    }
+    return null;
+}
+````
