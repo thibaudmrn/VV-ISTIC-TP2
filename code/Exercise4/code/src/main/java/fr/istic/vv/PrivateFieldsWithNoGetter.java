@@ -1,12 +1,14 @@
 package fr.istic.vv;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,9 +18,11 @@ import java.util.Set;
 public class PrivateFieldsWithNoGetter extends VoidVisitorWithDefaults<Void> {
 
     Set<VariableDeclarator> privateFields;
+    List<Result> resultList;
 
-    public PrivateFieldsWithNoGetter() {
+    public PrivateFieldsWithNoGetter(List<Result> resultList) {
         privateFields = new HashSet<>();
+        this.resultList = resultList;
     }
 
     @Override
@@ -30,14 +34,19 @@ public class PrivateFieldsWithNoGetter extends VoidVisitorWithDefaults<Void> {
 
     public void visitTypeDeclaration(TypeDeclaration<?> declaration, Void arg) {
         if (!declaration.isPublic()) return;
-        System.out.println(declaration.getFullyQualifiedName().orElse("[Anonymous]"));
+        String className = declaration.getFullyQualifiedName().orElse("[Anonymous]");
+        System.out.println(className);
         for (FieldDeclaration field : declaration.getFields()) {
             field.accept(this, arg);
         }
         for (MethodDeclaration method : declaration.getMethods()) {
             method.accept(this, arg);
         }
-        privateFields.forEach(pField -> System.out.println(pField.getNameAsString()));
+        privateFields.forEach(pField -> {
+            System.out.println(pField.getNameAsString());
+            resultList.add(new Result(className, pField.getTypeAsString(), pField.getNameAsString()));
+        });
+        privateFields.clear();
     }
 
     @Override
